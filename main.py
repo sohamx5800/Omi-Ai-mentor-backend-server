@@ -94,7 +94,7 @@ async def receive_transcription(request: Request):
     notification_message = summarize_text(ai_response)
     return {"message": "Webhook received", "response": ai_response, "notification": notification_message}
 
-@app.post("/signup")
+@app.post("//signup")
 async def signup(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -107,7 +107,7 @@ async def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(db_user)
     return {"message": "User created", "user_id": user.omi_user_id}
 
-@app.post("/login")
+@app.post("//login")
 async def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password):
