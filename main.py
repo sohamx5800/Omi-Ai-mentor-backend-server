@@ -58,7 +58,7 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
-@app.post("/livetranscript")
+@app.post("//livetranscript")
 async def live_transcription(request: Request, db: Session = Depends(get_db)):
     data = await request.json()
     segments = data.get("segments", [])
@@ -81,7 +81,7 @@ async def live_transcription(request: Request, db: Session = Depends(get_db)):
 
     return {"message": notification_message, "response": ai_response}
 
-@app.post("/webhook")
+@app.post("//webhook")
 async def receive_transcription(request: Request):
     data = await request.json()
     transcript = data.get("transcript", "").strip()
