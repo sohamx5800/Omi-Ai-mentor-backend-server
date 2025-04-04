@@ -114,30 +114,30 @@ async def login(user: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return {"message": "Login successful", "user_id": db_user.omi_user_id}
 
-@app.get("/tasks/{user_id}")
+@app.get("//tasks/{user_id}")
 def get_tasks(user_id: str, db: Session = Depends(get_db)):
     today = datetime.now().date()
     tasks = db.query(Task).filter(Task.user_id == user_id, Task.date == today).all()
     return {"tasks": [{"id": t.id, "task": t.task, "time": t.time, "date": str(t.date)} for t in tasks]}
 
-@app.post("/tasks/{user_id}")
+@app.post("//tasks/{user_id}")
 def add_task(user_id: str, task: TaskRequest, db: Session = Depends(get_db)):
     db_task = Task(user_id=user_id, task=task.task, time=task.time, date=task.date)
     db.add(db_task)
     db.commit()
     return {"message": "Task added"}
 
-@app.get("/memories/{user_id}")
+@app.get("//memories/{user_id}")
 def get_memories(user_id: str):
     return {"memories": omi_client.read_memories(user_id)}
 
-@app.get("/chat/{user_id}")
+@app.get("//chat/{user_id}")
 def get_chat(user_id: str, db: Session = Depends(get_db)):
     chats = db.query(Chat).filter(Chat.user_id == user_id).all()
     return {"chats": [{"user": c.user_message, "mentor": c.mentor_response, "timestamp": c.timestamp} for c in chats]}
 
 
-@app.delete("/memories/{user_id}/{memory_id}")
+@app.delete("//memories/{user_id}/{memory_id}")
 def delete_memory(user_id: str, memory_id: str):
 
     response = omi_client.delete_memory(user_id, memory_id)
