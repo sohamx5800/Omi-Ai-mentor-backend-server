@@ -58,6 +58,29 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
+@app.post("//livetranscript")
+async def live_transcription(request: Request, db: Session = Depends(get_db)):
+    data = await request.json()
+    segments = data.get("segments", [])
+    user_id = data.get("user_id", "unknown")
+    transcript = " ".join(segment["text"] for segment in segments if "text" in segment).strip()
+    if not transcript:
+        return {"message": "No transcription received"}
+
+    translated_text = translator.translate(transcript)
+    ai_response = ask_groq(translated_text)
+    notification_message = summarize_text(ai_response)
+    
+    task_data = detect_task(transcript)
+    if task_data:
+        db.add(Task(user_id=user_id, **task_data))
+        db.commit()
+
+    db.add(Chat(user_id=user_id, user_message=transcript, mentor_response=ai_response, timestamp=str(datetime.now())))
+    db.commit()
+
+    return {"message": notification_message, "response": ai_response}
+
 @app.post("/livetranscript")
 async def live_transcription(request: Request, db: Session = Depends(get_db)):
     data = await request.json()
